@@ -35,13 +35,19 @@ export default function Header() {
   const classes = useStyles();
 
   return (
-    <AppBar position="static" elevation={0} className={classes.root}>
+    <AppBar position="sticky" elevation={2} className={classes.root}>
       <Toolbar>
         <Grid container alignItems="center">
           <Grid item>
             <Typography variant="h6" style={{ color: "#000" }}>
-              ChatBot
+              CB
             </Typography>
+          </Grid>
+          <Grid item>
+            <img
+              src={"https://i.ibb.co/Hprn3NZ/chat-Bot-Logo.png"}
+              style={{ height: "30px", width: "30px" }}
+            />
           </Grid>
           <Grid item sm></Grid>
         </Grid>

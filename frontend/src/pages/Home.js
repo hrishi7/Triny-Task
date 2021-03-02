@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Controls from "../components/controls/Controls";
 import {
   Grid,
@@ -17,8 +17,19 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "#fff",
   },
   pageContent: {
+    width: "450px",
     margin: theme.spacing(5),
     padding: theme.spacing(5),
+  },
+  paper: {
+    margin: theme.spacing(2),
+    padding: theme.spacing(2),
+    maxWidth: "350px",
+  },
+  submitBoxContainer: {
+    // width: "450px",
+    // margin: theme.spacing(2),
+    // padding: theme.spacing(2),
   },
 }));
 
@@ -32,6 +43,10 @@ export default function Home(props) {
     message: "",
     type: "",
   });
+  const messagesEndRef = useRef(null);
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
   const classes = useStyles();
 
   const handleInputChange = (e) => {
@@ -65,7 +80,7 @@ export default function Home(props) {
       if (result.success) {
         setNotify({
           isOpen: true,
-          message: result.message,
+          message: "You Asked a Question",
           type: "success",
         });
         let prevMessages = [...allMessages];
@@ -104,33 +119,68 @@ export default function Home(props) {
     }
   }, []);
 
+  useEffect(() => {
+    scrollToBottom();
+  }, [allMessages]);
+
   return (
-    <Paper className={classes.pageContent}>
-      <Typography variant="h5">ChatBot</Typography>
-      <Grid
-        style={{
-          justifyContent: "center",
-          alignItems: "center",
-          height: "400px",
-          width: "300px",
-          backgroundColor: "yellow",
-          overflowY: "scroll",
-        }}
-      ></Grid>
-      <Form onSubmit={handleSubmit}>
-        <Grid container>
-          <Grid item xs={12}>
-            <Controls.Input
-              name="message"
-              label="Write Here..*"
-              value={message}
-              onChange={handleInputChange}
-              error={errors.message}
-            />
-
-            <div style={{ display: "flex", alignItems: "center" }}>
-              {loading ? <CircularProgress size={20} /> : <></>}
-
+    <Grid
+      container
+      justify="center"
+      alignContent="center"
+      spacing={0}
+      direction="column"
+    >
+      <Grid item>
+        <Typography variant="h5">Ask Your Quries.</Typography>
+      </Grid>
+      <Grid item>
+        <Paper
+          className={classes.pageContent}
+          style={{ height: "350px", overflowY: "scroll" }}
+        >
+          <Grid container spacing={0} direction="column">
+            {allMessages.map((value, index) => (
+              <Grid key={value} item>
+                {index % 2 == 0 ? (
+                  <Paper
+                    className={classes.paper}
+                    style={{ float: "left", backgroundColor: "#dddddd" }}
+                  >
+                    {value}
+                  </Paper>
+                ) : (
+                  <Paper
+                    className={classes.paper}
+                    style={{ float: "right", backgroundColor: "#fff" }}
+                  >
+                    {value}
+                  </Paper>
+                )}
+              </Grid>
+            ))}
+            <div ref={messagesEndRef} />
+          </Grid>
+        </Paper>
+      </Grid>
+      <Grid item>
+        <Form
+          onSubmit={handleSubmit}
+          // className={classes.submitBoxContainer}
+          style={{ marginTop: "-41px" }}
+        >
+          <Grid container justify="center" alignContent="center">
+            <Grid item xs={12}>
+              <Controls.Input
+                name="message"
+                label="Write Here..*"
+                value={message}
+                onChange={handleInputChange}
+                error={errors.message}
+              />
+            </Grid>
+            <Grid item>{loading ? <CircularProgress size={20} /> : <></>}</Grid>
+            <Grid item>
               <Controls.Button type="submit" disabled={loading} text="Submit" />
 
               <Controls.Button
@@ -139,11 +189,11 @@ export default function Home(props) {
                 color="default"
                 onClick={resetForm}
               />
-            </div>
+            </Grid>
           </Grid>
-        </Grid>
-      </Form>
-      <Notification notify={notify} setNotify={setNotify} />
-    </Paper>
+        </Form>
+        <Notification notify={notify} setNotify={setNotify} />
+      </Grid>
+    </Grid>
   );
 }
